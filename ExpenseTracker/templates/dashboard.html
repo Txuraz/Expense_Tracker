@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Center the content */
+        body {
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        table thead th {
+            font-weight: bold;
+        }
+
+        /* Conditional text color based on transaction type */
+        table tbody tr.expenses {
+            color: red;
+        }
+
+        table tbody tr.income {
+            color: green;
+        }
+        /* Add border and padding to each section */
+        .dashboard-section {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        /* Reduce the font size for total values */
+        .dashboard-section h3 {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h1>Expenses Tracker</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="dashboard-section">
+                    <h3 style="font-weight: bold;">Total Balance:</h3>
+                    <h3 style="color: black; font-weight: bolder;">{{ total_balance }}</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-section">
+                    <h3 style="font-weight: bold;">Total Expenses:</h3>
+                    <h3 style="color: red; font-weight: bolder;">{{ total_expenses }}</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-section">
+                    <h3 style="font-weight: bold;">Total Income:</h3>
+                    <h3 style="color: green; font-weight: bolder;">{{ total_income }} </h3>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center mt-4">
+                <button class="btn btn-primary mr-3" data-toggle="modal" data-target="#addExpensesModal">Add Transaction</button>
+               <button class="btn btn-secondary mr-3" id="filterButton" data-toggle="modal" data-target="#filterModal">Filter</button>
+                <a class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
+            </div>
+        </div>
+
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>All Income and Expenses</h2>
+<table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction_entry in transaction_data %}
+                        <tr class="{{ transaction_entry.type|lower }}">
+                            <td>{{ transaction_entry.type }}</td>
+                            <td>{{ transaction_entry.category }}</td>
+                            <td>{{ transaction_entry.amount }}</td>
+                            <td>{{ transaction_entry.date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <ul class="pagination">
+                {% if transaction_data.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ transaction_data.previous_page_number }}">Previous</a>
+                </li>
+                {% endif %}
+                <li class="page-item active">
+                    <span class="page-link">{{ transaction_data.number }}</span>
+                </li>
+                {% if transaction_data.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ transaction_data.next_page_number }}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ transaction_data.paginator.num_pages }}">Last</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Transactions</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Filter Form -->
+                <form method="post" action="{% url 'filter_transactions' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="startDate">Start Date:</label>
+                        <input type="date" class="form-control" id="startDate" name="start_date" value="{{ filter_state.start_date }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">End Date:</label>
+                        <input type="date" class="form-control" id="endDate" name="end_date" value="{{ filter_state.end_date }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="filterType">Type:</label>
+                        <select class="form-control" id="filterType" name="filter_type">
+                            <option value="">Select Type</option>
+                            <option value="Income" {% if filter_state.filter_type == "Income" %}selected{% endif %}>Income</option>
+                            <option value="Expenses" {% if filter_state.filter_type == "Expenses" %}selected{% endif %}>Expenses</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filterCategory">Category:</label>
+                        <select class="form-control" id="filterCategory" name="filter_category">
+                            <option value="">Select Category</option>
+                            <option value="Borrow">Borrow</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Education">Education</option>
+                            <option value="Food">Food</option>
+                            <option value="Hospital">Borrow</option>
+                            <option value="Pocket Money">Pocket Money</option>
+                            <option value="Rent">Rent</option>
+                            <option value="Salary">Salary</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary mr-3" id="filterButton" data-toggle="modal" data-target="#filterModal">Filter</button>
+                        <button class="btn btn-secondary" id="clearFilterButton" onclick="clearFilters()">Clear Filter</button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Transaction Modal -->
+    <div class="modal fade" id="addExpensesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Expenses</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                        <form method="post" action="{% url 'save_transaction' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="amount">Amount:</label>
+                            <input type="text" class="form-control" id="amount" name="amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="type">Type:</label>
+                            <select class="form-control" id="type" name="type">
+                                <option value="Income">Income</option>
+                                <option value="Expenses">Expenses</option>
+                            </select>
+                        </div>
+                            <div class="form-group">
+                            <label for="category">Category:</label>
+                            <select class="form-control" id="category" name="category">
+                                <option value="" disabled selected>Select a Category</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Date:</label>
+                            <input type="date" class="form-control" id="date" name="date" required>
+                        </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>  </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <script>
+        // Initialize filter state variables
+        var filterState = {
+            start_date: "",
+            end_date: "",
+            filter_type: "",
+            filter_category: ""
+        };
+
+        // Set filter state when the "Apply Filter" button is clicked
+        document.getElementById("filterModal").addEventListener("submit", function () {
+            filterState.start_date = document.getElementById("startDate").value;
+            filterState.end_date = document.getElementById("endDate").value;
+            filterState.filter_type = document.getElementById("filterType").value;
+            filterState.filter_category = document.getElementById("filterCategory").value;
+
+            // Store filter state in local storage
+            localStorage.setItem("filterState", JSON.stringify(filterState));
+        });
+
+        // Clear Filter Button Click Event
+        document.getElementById("clearFilterButton").addEventListener("click", function () {
+            // Clear filter state and local storage
+            filterState = {
+                start_date: "",
+                end_date: "",
+                filter_type: "",
+                filter_category: ""
+            };
+            localStorage.removeItem("filterState");
+
+            // Reset filter inputs
+            document.getElementById("startDate").value = "";
+            document.getElementById("endDate").value = "";
+            document.getElementById("filterType").value = "";
+            document.getElementById("filterCategory").value = "";
+        });
+
+        // Retrieve filter state from local storage and pre-fill the filter inputs
+        var savedFilterState = localStorage.getItem("filterState");
+        if (savedFilterState) {
+            filterState = JSON.parse(savedFilterState);
+            document.getElementById("startDate").value = filterState.start_date;
+            document.getElementById("endDate").value = filterState.end_date;
+            document.getElementById("filterType").value = filterState.filter_type;
+            document.getElementById("filterCategory").value = filterState.filter_category;
+        }
+
+        function clearFilters() {
+        window.location.href = "{% url 'dashboard' %}";
+    }
+        const typeSelect = document.getElementById("type");
+        const categorySelect = document.getElementById("category");
+
+        // Function to update category options based on the selected type
+        function updateCategoryOptions() {
+            const selectedType = typeSelect.value;
+            categorySelect.innerHTML = ""; // Clear existing options
+
+            // Define category options based on the selected type
+            const categories = {
+                Income: ["Salary", "Borrow", "Pocket Money", "Rent"],
+                Expenses: ["Food", "Clothing", "Hospital", "Education"]
+            };
+
+            // Create new options based on the selected type
+            const categoryOptions = categories[selectedType];
+            categoryOptions.forEach(category => {
+                const option = document.createElement("option");
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        // Attach an event listener to the type select input
+        typeSelect.addEventListener("change", updateCategoryOptions);
+
+        // Call the updateCategoryOptions function on page load to initialize the category options
+        updateCategoryOptions();
+    </script>
+    <!-- Add jQuery and Bootstrap JS scripts here -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <style>
+        /* Custom CSS to center the form */
+        .centered-form {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .small-form {
+            max-width: 300px;
+        }
+
+        /* Custom CSS for the error messages */
+        .messages {
+            list-style: none;
+            padding: 0;
+            text-align: center;
+        }
+        .messages li {
+            color: red;
+            font-weight: bold;
+        }
+                .footer {
+            text-align: center;
+            font-weight: bold;
+                    margin-top: 300px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Messages Block in the Middle -->
+    <div class="container-fluid centered-form">
+    <h1>Expense Tracker</h1>
+        <h1>Login</h1>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <!-- Login Form -->
+        <div class="card small-form">
+            <div class="card-body">
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email:</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password:</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <div class="mt-3">
+                    Register Account! <a href="{% url 'signup' %}">Register</a>
+                </div>
+            </div>
+        </div>
+    <div class="footer">
+            Created by: Team DevOps [Suraj Kapali, Nirajan Dangal, Anisha Thapa Magar, Udrit Dhakal]
+        </div>
+    </div>
+</body>
+</html>
