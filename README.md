@@ -1,6 +1,6 @@
 # Expense_Tracker
 
-This is Simple Expense Tracker system built in Python(Django Framework). In this system user can register and login to system and track their income and expenses.
+This is Simple Expense Tracker system built in Python(Django Framework). In this system user can register and login to system and track their income and expenses..
 
 ## Getting Started
 
