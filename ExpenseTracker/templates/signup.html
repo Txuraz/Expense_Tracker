@@ -37,6 +37,7 @@
     <!-- Messages Block in the Middle -->
     <div class="container-fluid centered-form">
     <h1>Expense Tracker </h1>
+        <h2 class="card-title">Sign Up</h2>
         {% if messages %}
             <ul class="messages">
                 {% for message in messages %}
@@ -45,7 +46,7 @@
             </ul>
         {% endif %}
 
-       <h2 class="card-title">Sign Up</h2>
+       
         <div class="card small-form">
             <div class="card-body">
                 <form action="{% url 'signup' %}" method="post">
