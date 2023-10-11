@@ -12,7 +12,7 @@ class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.CharField(max_length=50, choices=TRANSACTION_TYPES)
-    type = models.CharField(max_length=50, choices=TRANSACTION_TYPES)  # Include the 'type' field
+    type = models.CharField(max_length=50, choices=TRANSACTION_TYPES)
     date = models.DateField()
 
     def is_income(self):

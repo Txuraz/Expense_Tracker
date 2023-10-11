@@ -64,7 +64,7 @@ def dashboard(request):
         # Validate and save the data
         if amount and category and transaction_type and date:
             transaction = Transaction.objects.create(
-                user=request.user,  # Assuming you have user authentication
+                user=request.user,
                 amount=amount,
                 category=category,
                 type=transaction_type,
