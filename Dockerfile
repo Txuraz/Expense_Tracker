@@ -8,6 +8,6 @@ RUN pip install -r requirements.txt
 
 COPY . /expenseTracker
 
-EXPOSE 8081
+EXPOSE 8000
 
-CMD python /expenseTracker/manage.py runserver 0.0.0.0:8081
+CMD python /expenseTracker/manage.py runserver 0.0.0.0:8000
