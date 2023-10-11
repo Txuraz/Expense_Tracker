@@ -38,6 +38,7 @@ Before you can run the app, make sure you have the following installed:
    ```
 6. Apply database migrations:
    ```
+   python manage.py makemigrations
    python manage.py migrate
    ```
 7. Start the development server:
