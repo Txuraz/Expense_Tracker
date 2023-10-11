@@ -1,6 +1,6 @@
 version : "3.3"
 services : 
   web :
-    image : txuraz/expense-tracker:1.0.0.0-release
+    image : expense-tracker
     ports : 
       - "8081:8081"
