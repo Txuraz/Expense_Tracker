@@ -51,4 +51,4 @@ Once the development server is running, you can access the Django app in your we
 ## Note
 This app is created for Assignment for Buddha Tech by team DevOps [Suraj Kapali, Nirajan Dangal, Anisha Thapa Magar, Udrit Dhakal]
 
-   
+   hello
